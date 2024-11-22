@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        header {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+
+        .data-container {
+            font-size: 20px;
+            color: #333;
+            margin: 20px auto;
+            max-width: 600px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #fff;
+        }
+
+        .data {
+            font-size: 24px;
+            margin: 10px 0;
+        }
+
+        .error {
+            color: red;
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Monitoring System</h1>
+        <p>Live Data from Blynk</p>
+    </header>
+    <div class="data-container">
+        <p class="data">Asap (Smoke): <span id="smoke">Loading...</span></p>
+        <p class="data">Suhu (Temperature): <span id="temperature">Loading...</span> °C</p>
+        <p class="data">Gerakan (PIR): <span id="pir">Loading...</span></p>
+        <p id="error-message" class="error"></p>
+    </div>
+
+    <script>
+        const AUTH_TOKEN = 'KSx2mKACw-gD8V9z8YD1aQtsZaFAsEnl'; // Ganti dengan Auth Token Anda
+        const BASE_URL = 'https://blynk.cloud/external/api/get?token=' + AUTH_TOKEN;
+
+        // Fungsi untuk mengambil data dari Blynk
+        async function fetchData(pin, elementId) {
+            try {
+                const response = await fetch(`${BASE_URL}&pin=${pin}`);
+                if (!response.ok) throw new Error(`Failed to fetch data for pin ${pin}`);
+                const data = await response.text();
+                document.getElementById(elementId).innerText = data;
+            } catch (error) {
+                console.error(error);
+                document.getElementById('error-message').innerText = error.message;
+            }
+        }
+
+        // Fungsi untuk memperbarui semua data
+        function updateData() {
+            fetchData('V3', 'smoke');       // Data asap (smoke)
+            fetchData('V4', 'temperature'); // Data suhu (temperature)
+            fetchData('V5', 'pir');         // Data PIR (gerakan)
+        }
+
+        // Jalankan pembaruan data setiap 2 detik
+        setInterval(updateData, 2000);
+        updateData(); // Update data pertama kali saat halaman dimuat
+    </script>
+</body>
+
+</html>
